@@ -1,0 +1,13 @@
+name: Bug Report
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Steps to reproduce + expected vs actual
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Browser, OS, resolution
