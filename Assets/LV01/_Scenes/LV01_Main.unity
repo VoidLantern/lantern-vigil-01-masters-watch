@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 382271656}
   - component: {fileID: 382271655}
   - component: {fileID: 382271654}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -586,7 +586,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  jumpForce: 3
+  inAirSlowMultiplier: 0.75
   facingDirection: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckDistance: 1
 --- !u!1 &2001061495
 GameObject:
   m_ObjectHideFlags: 0
