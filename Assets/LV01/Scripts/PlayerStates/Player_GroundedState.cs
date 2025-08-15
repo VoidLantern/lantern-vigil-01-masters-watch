@@ -10,8 +10,19 @@ public class Player_GroundedState : EntityState
     {
         base.Update();
 
-        if (playerInputs.Player.Jump.WasPerformedThisFrame())
+        // if (playerInputs.Player.Jump.WasPerformedThisFrame())
+        //     stateMachine.ChangeState(player.JumpState);
+    }
+
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+
+        if (player.jumpBufferCounter > 0 && player.coyoteCounter > 0)
+        {
+            player.jumpBufferCounter = 0f;
             stateMachine.ChangeState(player.JumpState);
+        }
     }
 
 }

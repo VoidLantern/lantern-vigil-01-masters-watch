@@ -21,10 +21,31 @@ public class Player : MonoBehaviour
     public float inAirSlowMultiplier;
     private bool facingRight = true;
     public int facingDirection = 1;
+
+    [Header("Jump Assist")]
+    public float coyoteTime = .12f;
+    public float jumpBuffer = .12f;
+    [HideInInspector] public float coyoteCounter;
+    [HideInInspector] public float jumpBufferCounter;
     [Header("Collisin Detection")]
     public LayerMask groundLayer;
     [SerializeField] private float groundCheckDistance = 1f;
     public bool GroundDetected { get; private set; }
+
+    void OnEnable()
+    {
+        PlayerInputs.Enable();
+        PlayerInputs.Player.Movement.performed += OnMove;
+        PlayerInputs.Player.Movement.canceled += OnMoveCancel;
+        PlayerInputs.Player.Jump.performed += OnJump;
+    }
+    void OnDisable()
+    {
+        PlayerInputs.Player.Movement.performed -= OnMove;
+        PlayerInputs.Player.Movement.canceled -= OnMoveCancel;
+        PlayerInputs.Player.Jump.canceled -= OnJump;
+        PlayerInputs.Disable();
+    }
 
     void Awake()
     {
@@ -37,18 +58,7 @@ public class Player : MonoBehaviour
         JumpState = new Player_JumpState(this, StateMachine, "jumpFall");
         FallState = new Player_FallState(this, StateMachine, "jumpFall");
     }
-    void OnEnable()
-    {
-        PlayerInputs.Enable();
-        PlayerInputs.Player.Movement.performed += OnMove;
-        PlayerInputs.Player.Movement.canceled += OnMoveCancel;
-    }
-    void OnDisable()
-    {
-        PlayerInputs.Player.Movement.performed -= OnMove;
-        PlayerInputs.Player.Movement.canceled -= OnMoveCancel;
-        PlayerInputs.Disable();
-    }
+
     void Start()
     {
         StateMachine.InitializeState(IdleState);
@@ -64,6 +74,11 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         StateMachine.PhysicsUpdateActiveState();
+
+        if (GroundDetected) coyoteCounter = coyoteTime;
+        else coyoteCounter = Mathf.Max(0f, coyoteCounter - Time.fixedDeltaTime);
+        if (jumpBufferCounter > 0)
+            jumpBufferCounter = Mathf.Max(0, jumpBufferCounter - Time.fixedDeltaTime);
     }
 
 
@@ -92,6 +107,7 @@ public class Player : MonoBehaviour
 
     void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
     void OnMoveCancel(InputAction.CallbackContext ctx) => MoveInput = Vector2.zero;
+    void OnJump(InputAction.CallbackContext _) => jumpBufferCounter = jumpBuffer;
 
 
     void HandleCollisionDetection()
