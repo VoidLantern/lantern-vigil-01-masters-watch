@@ -6,19 +6,26 @@ public class StateMachine
 
     public void InitializeState(EntityState startState)
     {
+        if (startState == null) return;
         CurrentState = startState;
         CurrentState.Enter();
     }
 
     public void ChangeState(EntityState newState)
     {
-        CurrentState.Exit();
+        if (newState == null || CurrentState == newState) return;
+        CurrentState?.Exit();
         CurrentState = newState;
-        CurrentState.Enter();
+        CurrentState?.Enter();
     }
 
     public void UpdateActiveState()
     {
         CurrentState.Update();
+    }
+
+    public void PhysicsUpdateActiveState()
+    {
+        CurrentState?.PhysicsUpdate();
     }
 }

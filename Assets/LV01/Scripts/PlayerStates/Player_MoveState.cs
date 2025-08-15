@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player_MoveState : Player_GroundedState
@@ -6,15 +7,21 @@ public class Player_MoveState : Player_GroundedState
     {
     }
 
+
     public override void Update()
     {
         base.Update();
 
-        player.SetVelocity(player.MoveInput.x * player.moveSpeed, rb.linearVelocity.y);
-
-        if (player.MoveInput.x == 0)
+        if (Math.Abs(player.MoveInput.x) < 0.001f)
         {
             stateMachine.ChangeState(player.IdleState);
         }
+    }
+
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+        float x = player.MoveInput.x * player.moveSpeed;
+        player.SetVelocity(x, rb.linearVelocity.y);
     }
 }

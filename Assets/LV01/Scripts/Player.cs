@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
     public Animator Anim { get; private set; }
     [Header("Movement Details")]
     public Vector2 MoveInput { get; private set; }
-    [SerializeField] private float moveSpeed;
+    public float moveSpeed;
     private bool facingRight = true;
     public int facingDirection = 1;
 
@@ -49,6 +49,11 @@ public class Player : MonoBehaviour
         StateMachine.UpdateActiveState();
     }
 
+    void FixedUpdate()
+    {
+        StateMachine.PhysicsUpdateActiveState();
+    }
+
 
     public void SetVelocity(float xVelocity, float yVelocity)
     {
@@ -64,7 +69,10 @@ public class Player : MonoBehaviour
 
     public void Flip()
     {
-        transform.Rotate(0, 180, 0);
+        // transform.Rotate(0, 180, 0);
+        var s = transform.localScale;
+        s.x *= -1f;
+        transform.localScale = s;
         facingRight = !facingRight;
         facingDirection *= -1;
     }

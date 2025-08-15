@@ -4,6 +4,7 @@ public abstract class EntityState
 {
     protected Player player;
     protected StateMachine stateMachine;
+    protected int animBoolHash;
     protected string stateName;
     protected Rigidbody2D rb;
     protected Animator anim;
@@ -14,16 +15,19 @@ public abstract class EntityState
         this.stateName = stateName;
         rb = player.Rb;
         anim = player.Anim;
+        animBoolHash = Animator.StringToHash(stateName);
     }
 
     public virtual void Enter()
     {
-        anim.SetBool(stateName, true);
+        anim.SetBool(animBoolHash, true);
     }
     public virtual void Update() { }
     public virtual void Exit()
     {
-        anim.SetBool(stateName, false);
+        anim.SetBool(animBoolHash, false);
     }
+
+    public virtual void PhysicsUpdate() { }
 
 }
