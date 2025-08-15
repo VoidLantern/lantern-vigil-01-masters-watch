@@ -8,14 +8,23 @@ public class Player : MonoBehaviour
     public PlayerInputs PlayerInputs { get; private set; }
     public Player_IdleState IdleState { get; private set; }
     public Player_MoveState MoveState { get; private set; }
+    public Player_JumpState JumpState { get; private set; }
+    public Player_FallState FallState { get; private set; }
+
     [Header("Player Components")]
     public Rigidbody2D Rb { get; private set; }
     public Animator Anim { get; private set; }
     [Header("Movement Details")]
     public Vector2 MoveInput { get; private set; }
     public float moveSpeed;
+    public float jumpForce;
+    public float inAirSlowMultiplier;
     private bool facingRight = true;
     public int facingDirection = 1;
+    [Header("Collisin Detection")]
+    public LayerMask groundLayer;
+    [SerializeField] private float groundCheckDistance = 1f;
+    public bool GroundDetected { get; private set; }
 
     void Awake()
     {
@@ -25,6 +34,8 @@ public class Player : MonoBehaviour
         PlayerInputs = new PlayerInputs();
         IdleState = new Player_IdleState(this, StateMachine, "idle");
         MoveState = new Player_MoveState(this, StateMachine, "move");
+        JumpState = new Player_JumpState(this, StateMachine, "jumpFall");
+        FallState = new Player_FallState(this, StateMachine, "jumpFall");
     }
     void OnEnable()
     {
@@ -46,6 +57,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        HandleCollisionDetection();
         StateMachine.UpdateActiveState();
     }
 
@@ -70,7 +82,7 @@ public class Player : MonoBehaviour
     public void Flip()
     {
         // transform.Rotate(0, 180, 0);
-        var s = transform.localScale;
+        Vector3 s = transform.localScale;
         s.x *= -1f;
         transform.localScale = s;
         facingRight = !facingRight;
@@ -80,4 +92,16 @@ public class Player : MonoBehaviour
 
     void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
     void OnMoveCancel(InputAction.CallbackContext ctx) => MoveInput = Vector2.zero;
+
+
+    void HandleCollisionDetection()
+    {
+        GroundDetected = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(transform.position, transform.position + new Vector3(0, -groundCheckDistance));
+    }
+
+
 }
