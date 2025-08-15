@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player_IdleState : Player_GroundedState
@@ -15,7 +16,7 @@ public class Player_IdleState : Player_GroundedState
     public override void Update()
     {
         base.Update();
-        if (player.MoveInput.x != 0)
+        if (Math.Abs(player.MoveInput.x) > 0.001f)
         {
             stateMachine.ChangeState(player.MoveState);
         }
