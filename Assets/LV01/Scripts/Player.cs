@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class Player : MonoBehaviour
     public Animator Anim { get; private set; }
     [Header("Movement Details")]
     public Vector2 MoveInput { get; private set; }
-    public float moveSpeed;
+    [SerializeField] private float moveSpeed;
     private bool facingRight = true;
     public int facingDirection = 1;
 
@@ -28,12 +29,13 @@ public class Player : MonoBehaviour
     void OnEnable()
     {
         PlayerInputs.Enable();
-
-        PlayerInputs.Player.Movement.performed += ctx => MoveInput = ctx.ReadValue<Vector2>();
-        PlayerInputs.Player.Movement.canceled += ctx => MoveInput = Vector2.zero;
+        PlayerInputs.Player.Movement.performed += OnMove;
+        PlayerInputs.Player.Movement.canceled += OnMoveCancel;
     }
     void OnDisable()
     {
+        PlayerInputs.Player.Movement.performed -= OnMove;
+        PlayerInputs.Player.Movement.canceled -= OnMoveCancel;
         PlayerInputs.Disable();
     }
     void Start()
@@ -66,4 +68,8 @@ public class Player : MonoBehaviour
         facingRight = !facingRight;
         facingDirection *= -1;
     }
+
+
+    void OnMove(InputAction.CallbackContext ctx) => MoveInput = ctx.ReadValue<Vector2>();
+    void OnMoveCancel(InputAction.CallbackContext ctx) => MoveInput = Vector2.zero;
 }
