@@ -16,6 +16,7 @@ public class Player_MoveState : Player_GroundedState
         {
             stateMachine.ChangeState(player.IdleState);
         }
+
     }
 
     public override void PhysicsUpdate()
