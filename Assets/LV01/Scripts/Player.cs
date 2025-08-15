@@ -10,15 +10,19 @@ public class Player : MonoBehaviour
     public Player_MoveState MoveState { get; private set; }
     public Player_JumpState JumpState { get; private set; }
     public Player_FallState FallState { get; private set; }
+    public Player_WallSlideState WallSlideState { get; private set; }
+    public Player_WallJumpState WallJumpState { get; private set; }
 
     [Header("Player Components")]
     public Rigidbody2D Rb { get; private set; }
     public Animator Anim { get; private set; }
     [Header("Movement Details")]
     public Vector2 MoveInput { get; private set; }
+    public Vector2 wallJumpForce;
     public float moveSpeed;
     public float jumpForce;
     public float inAirSlowMultiplier;
+    public float wallSlideSlowMultiplier;
     private bool facingRight = true;
     public int facingDirection = 1;
 
@@ -27,10 +31,14 @@ public class Player : MonoBehaviour
     public float jumpBuffer = .12f;
     [HideInInspector] public float coyoteCounter;
     [HideInInspector] public float jumpBufferCounter;
-    [Header("Collisin Detection")]
+    [Header("Collision Detection")]
     public LayerMask groundLayer;
-    [SerializeField] private float groundCheckDistance = 1f;
+    [SerializeField] float groundCheckDistance = 1f;
+    [SerializeField] float wallCheckDistance = 1f;
+    [SerializeField] Transform wallCheckFirst;
+    [SerializeField] Transform wallCheckSecond;
     public bool GroundDetected { get; private set; }
+    public bool WallDetected { get; private set; }
 
     void OnEnable()
     {
@@ -43,7 +51,7 @@ public class Player : MonoBehaviour
     {
         PlayerInputs.Player.Movement.performed -= OnMove;
         PlayerInputs.Player.Movement.canceled -= OnMoveCancel;
-        PlayerInputs.Player.Jump.canceled -= OnJump;
+        PlayerInputs.Player.Jump.performed -= OnJump;
         PlayerInputs.Disable();
     }
 
@@ -57,6 +65,8 @@ public class Player : MonoBehaviour
         MoveState = new Player_MoveState(this, StateMachine, "move");
         JumpState = new Player_JumpState(this, StateMachine, "jumpFall");
         FallState = new Player_FallState(this, StateMachine, "jumpFall");
+        WallSlideState = new Player_WallSlideState(this, StateMachine, "wallSlide");
+        WallJumpState = new Player_WallJumpState(this, StateMachine, "jumpFall");
     }
 
     void Start()
@@ -67,12 +77,12 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        HandleCollisionDetection();
         StateMachine.UpdateActiveState();
     }
 
     void FixedUpdate()
     {
+        HandleCollisionDetection();
         StateMachine.PhysicsUpdateActiveState();
 
         if (GroundDetected) coyoteCounter = coyoteTime;
@@ -113,10 +123,14 @@ public class Player : MonoBehaviour
     void HandleCollisionDetection()
     {
         GroundDetected = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
+        WallDetected = Physics2D.Raycast(wallCheckFirst.position, Vector2.right * facingDirection, wallCheckDistance, groundLayer)
+                        && Physics2D.Raycast(wallCheckSecond.position, Vector2.right * facingDirection, wallCheckDistance, groundLayer);
     }
     void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, transform.position + new Vector3(0, -groundCheckDistance));
+        Gizmos.DrawLine(wallCheckFirst.position, wallCheckFirst.position + new Vector3(wallCheckDistance * facingDirection, 0));
+        Gizmos.DrawLine(wallCheckSecond.position, wallCheckSecond.position + new Vector3(wallCheckDistance * facingDirection, 0));
     }
 
 

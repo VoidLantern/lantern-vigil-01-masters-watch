@@ -7,6 +7,14 @@ public class Player_InAirState : EntityState
     {
     }
 
+    public override void Update()
+    {
+        base.Update();
+
+        if (player.WallDetected)
+            stateMachine.ChangeState(player.WallSlideState);
+    }
+
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
@@ -15,5 +23,6 @@ public class Player_InAirState : EntityState
         //     player.SetVelocity(player.MoveInput.x * player.moveSpeed * player.inAirSlowMultiplier, rb.linearVelocity.y);
 
         player.SetVelocity(player.MoveInput.x * player.moveSpeed * player.inAirSlowMultiplier, rb.linearVelocity.y);
+
     }
 }
