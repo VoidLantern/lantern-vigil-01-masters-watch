@@ -9,6 +9,7 @@ public abstract class EntityState
     protected Rigidbody2D rb;
     protected Animator anim;
     protected PlayerInputs playerInputs;
+    protected bool triggerCalled;
     public EntityState(Player player, StateMachine stateMachine, string stateName)
     {
         this.player = player;
@@ -23,6 +24,7 @@ public abstract class EntityState
     public virtual void Enter()
     {
         anim.SetBool(animBoolHash, true);
+        triggerCalled = false;
     }
     public virtual void Update() { }
     public virtual void Exit()
@@ -34,5 +36,8 @@ public abstract class EntityState
     {
         anim.SetFloat("yVelocity", rb.linearVelocity.y);
     }
+
+
+    public void AnimTrig() { triggerCalled = true; }
 
 }

@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public Player_FallState FallState { get; private set; }
     public Player_WallSlideState WallSlideState { get; private set; }
     public Player_WallJumpState WallJumpState { get; private set; }
+    public Player_BasicAttackState BasicAttackState { get; private set; }
 
     [Header("Player Components")]
     public Rigidbody2D Rb { get; private set; }
@@ -25,6 +26,10 @@ public class Player : MonoBehaviour
     public float wallSlideSlowMultiplier;
     private bool facingRight = true;
     public int facingDirection = 1;
+
+    [Header("Attack Details")]
+    public Vector2 attackVelocity;
+    public float attackVelocityDuration = .12f;
 
     [Header("Jump Assist")]
     public float coyoteTime = .12f;
@@ -67,6 +72,7 @@ public class Player : MonoBehaviour
         FallState = new Player_FallState(this, StateMachine, "jumpFall");
         WallSlideState = new Player_WallSlideState(this, StateMachine, "wallSlide");
         WallJumpState = new Player_WallJumpState(this, StateMachine, "jumpFall");
+        BasicAttackState = new Player_BasicAttackState(this, StateMachine, "basicAttack");
     }
 
     void Start()
@@ -78,6 +84,11 @@ public class Player : MonoBehaviour
     void Update()
     {
         StateMachine.UpdateActiveState();
+    }
+
+    public void AnimTrig()
+    {
+        StateMachine.CurrentState.AnimTrig();
     }
 
     void FixedUpdate()
