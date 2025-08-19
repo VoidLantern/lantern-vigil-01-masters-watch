@@ -10,6 +10,7 @@ public abstract class EntityState
     protected Animator anim;
     protected PlayerInputs playerInputs;
     protected bool triggerCalled;
+    protected float stateTimer;
     public EntityState(Player player, StateMachine stateMachine, string stateName)
     {
         this.player = player;
@@ -26,7 +27,10 @@ public abstract class EntityState
         anim.SetBool(animBoolHash, true);
         triggerCalled = false;
     }
-    public virtual void Update() { }
+    public virtual void Update()
+    {
+        anim.SetFloat("yVelocity", rb.linearVelocity.y);
+    }
     public virtual void Exit()
     {
         anim.SetBool(animBoolHash, false);

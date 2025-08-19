@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player_BasicAttackState : EntityState
@@ -11,10 +12,9 @@ public class Player_BasicAttackState : EntityState
     public override void Enter()
     {
         base.Enter();
+        player.swordCollider.SetActive(true);
         ApplyAttackVelocity();
     }
-
-
 
     public override void Update()
     {
@@ -26,7 +26,13 @@ public class Player_BasicAttackState : EntityState
             stateMachine.ChangeState(player.IdleState);
     }
 
-    private void ApplyAttackVelocity()
+    public override void Exit()
+    {
+        base.Exit();
+        player.swordCollider.SetActive(false);
+    }
+
+    void ApplyAttackVelocity()
     {
         attackVelocityTimer = player.attackVelocityDuration;
         player.SetVelocity(player.attackVelocity.x * player.facingDirection, player.attackVelocity.y);
@@ -38,4 +44,7 @@ public class Player_BasicAttackState : EntityState
         if (attackVelocityTimer < 0f)
             player.SetVelocity(0, rb.linearVelocity.y);
     }
+
+
+
 }

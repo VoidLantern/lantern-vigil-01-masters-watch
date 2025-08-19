@@ -17,10 +17,13 @@ public class Player : MonoBehaviour
     [Header("Player Components")]
     public Rigidbody2D Rb { get; private set; }
     public Animator Anim { get; private set; }
+    public GameObject swordCollider;
     [Header("Movement Details")]
     public Vector2 MoveInput { get; private set; }
     public Vector2 wallJumpForce;
     public float moveSpeed;
+    public float dashSpeed;
+    public float dashDuration;
     public float jumpForce;
     public float inAirSlowMultiplier;
     public float wallSlideSlowMultiplier;
@@ -30,6 +33,7 @@ public class Player : MonoBehaviour
     [Header("Attack Details")]
     public Vector2 attackVelocity;
     public float attackVelocityDuration = .12f;
+    public int damageAmount;
 
     [Header("Jump Assist")]
     public float coyoteTime = .12f;
@@ -38,6 +42,7 @@ public class Player : MonoBehaviour
     [HideInInspector] public float jumpBufferCounter;
     [Header("Collision Detection")]
     public LayerMask groundLayer;
+    public LayerMask wallLayer;
     [SerializeField] float groundCheckDistance = 1f;
     [SerializeField] float wallCheckDistance = 1f;
     [SerializeField] Transform wallCheckFirst;
@@ -64,6 +69,7 @@ public class Player : MonoBehaviour
     {
         Rb = GetComponent<Rigidbody2D>();
         Anim = GetComponentInChildren<Animator>();
+        swordCollider.SetActive(false);
         StateMachine = new StateMachine();
         PlayerInputs = new PlayerInputs();
         IdleState = new Player_IdleState(this, StateMachine, "idle");
@@ -134,8 +140,8 @@ public class Player : MonoBehaviour
     void HandleCollisionDetection()
     {
         GroundDetected = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
-        WallDetected = Physics2D.Raycast(wallCheckFirst.position, Vector2.right * facingDirection, wallCheckDistance, groundLayer)
-                        && Physics2D.Raycast(wallCheckSecond.position, Vector2.right * facingDirection, wallCheckDistance, groundLayer);
+        WallDetected = Physics2D.Raycast(wallCheckFirst.position, Vector2.right * facingDirection, wallCheckDistance, wallLayer)
+                        && Physics2D.Raycast(wallCheckSecond.position, Vector2.right * facingDirection, wallCheckDistance, wallLayer);
     }
     void OnDrawGizmos()
     {
@@ -143,6 +149,5 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(wallCheckFirst.position, wallCheckFirst.position + new Vector3(wallCheckDistance * facingDirection, 0));
         Gizmos.DrawLine(wallCheckSecond.position, wallCheckSecond.position + new Vector3(wallCheckDistance * facingDirection, 0));
     }
-
 
 }
